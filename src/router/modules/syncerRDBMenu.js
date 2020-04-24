@@ -18,7 +18,7 @@ const syncerMenuRouter = {
     },
     {
       path: 'line',
-      component: () => import('@/views/syncer/list/rdblists'),
+      component: () => import('@/views/charts/line'),
       name: 'RDB版本管理',
       meta: { title: 'RDB版本管理', noCache: true }
     }

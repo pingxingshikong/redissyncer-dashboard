@@ -11,6 +11,7 @@ import componentsRouter from './modules/components'
 import chartsRouter from './modules/charts'
 import tableRouter from './modules/table'
 import nestedRouter from './modules/nested'
+import  syncerMultiMenuRouter from './modules/multiAliveMenu'
 import syncerMenuRouter from './modules/syncermenu'
 
 /**
@@ -172,25 +173,26 @@ export const asyncRoutes = [
     ]
   },
 
-  {
-    path: '/icon',
-    component: Layout,
-    children: [
-      {
-        path: 'index',
-        component: () => import('@/views/icons/index'),
-        name: '图标',
-        meta: { title: '图标', icon: 'icon', noCache: true }
-      }
-    ]
-  },
+  // {
+  //   path: '/icon',
+  //   component: Layout,
+  //   children: [
+  //     {
+  //       path: 'index',
+  //       component: () => import('@/views/icons/index'),
+  //       name: '图标',
+  //       meta: { title: '图标', icon: 'icon', noCache: true }
+  //     }
+  //   ]
+  // },
 
   /** when your routing map is too long, you can split it into small modules **/
-  componentsRouter,
-  chartsRouter,
+  // componentsRouter,
+  // chartsRouter,
   syncerMenuRouter,
-  nestedRouter,
-  tableRouter,
+  syncerMultiMenuRouter,
+  // nestedRouter,
+  // tableRouter,
 
   // {
   //   path: '/example',
