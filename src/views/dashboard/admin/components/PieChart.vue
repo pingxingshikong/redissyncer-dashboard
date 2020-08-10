@@ -43,30 +43,31 @@ export default {
   methods: {
     initChart() {
       this.chart = echarts.init(this.$el, 'macarons')
-
       this.chart.setOption({
         tooltip: {
           trigger: 'item',
           formatter: '{a} <br/>{b} : {c} ({d}%)'
         },
         legend: {
-          left: 'center',
-          bottom: '10',
-          data: ['Industries', 'Technology', 'Forex', 'Gold', 'Forecasts']
+          orient: 'vertical',
+          right: 10,
+          // left: 'center',
+          // bottom: '10',
+          data: ['实时同步', 'RDB导入', '在线RDB导入', 'AOF导入', '在线AOF导入']
         },
         series: [
           {
-            name: 'WEEKLY WRITE ARTICLES',
+            name: '任务分类',
             type: 'pie',
             roseType: 'radius',
             radius: [15, 95],
-            center: ['50%', '38%'],
+            center: ['50%', '50%'],
             data: [
-              { value: 320, name: 'Industries' },
-              { value: 240, name: 'Technology' },
-              { value: 149, name: 'Forex' },
-              { value: 100, name: 'Gold' },
-              { value: 59, name: 'Forecasts' }
+              { value: 320, name: '实时同步' },
+              { value: 0, name: 'RDB导入' },
+              { value: 0, name: '在线RDB导入' },
+              { value: 0, name: 'AOF导入' },
+              { value: 0, name: '在线AOF导入' }
             ],
             animationEasing: 'cubicInOut',
             animationDuration: 2600

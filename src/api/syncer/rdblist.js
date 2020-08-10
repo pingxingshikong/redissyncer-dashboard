@@ -2,7 +2,7 @@ import request from '@/utils/request'
 
 export function getRdbList() {
   return request({
-    url: 'http://114.67.67.7:8080/api/v2/getRdbList',
+    url: '/api/v2/getRdbList',
     method: 'post',
     json: true,
     headers: {
@@ -13,7 +13,7 @@ export function getRdbList() {
 
 export function getRdbListByPage(data) {
   return request({
-    url: 'http://114.67.67.7:8080/api/v2/getRdbListByPage',
+    url: '/api/v2/getRdbListByPage',
     method: 'post',
     json: true,
     data: JSON.stringify(data),
@@ -30,7 +30,7 @@ export function getRdbListByPage(data) {
  */
 export function updateRdbList(data) {
   return request({
-    url: 'http://114.67.67.7:8080/api/v2/updateRdbVersion',
+    url: '/api/v2/updateRdbVersion',
     method: 'post',
     json: true,
     data: JSON.stringify(data),
@@ -46,7 +46,7 @@ export function updateRdbList(data) {
  */
 export function insertRdbList(data) {
   return request({
-    url: 'http://114.67.67.7:8080/api/v2/insetRdbVersion',
+    url: '/api/v2/insetRdbVersion',
     method: 'post',
     json: true,
     data: JSON.stringify(data),
@@ -62,7 +62,7 @@ export function insertRdbList(data) {
  */
 export function deleteRdbList(data) {
   return request({
-    url: 'http://114.67.67.7:8080/api/v2/deleteRdbVersion',
+    url: '/api/v2/deleteRdbVersion',
     method: 'post',
     json: true,
     data: JSON.stringify(data),

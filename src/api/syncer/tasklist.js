@@ -1,8 +1,20 @@
 import request from '@/utils/request'
 
+export function createTask(data) {
+  return request({
+    url: '/api/v2/createtask',
+    method: 'post',
+    json: true,
+    data: JSON.stringify(data),
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  })
+}
+
 export function getTaskList(data) {
   return request({
-    url: 'http://114.67.67.7:8080/api/v2/listtasks',
+    url: '/api/v2/listtasks',
     method: 'post',
     json: true,
     data: JSON.stringify(data),
@@ -14,7 +26,7 @@ export function getTaskList(data) {
 
 export function getTaskListByPage(data) {
   return request({
-    url: 'http://114.67.67.7:8080/api/v2/listtasksByPage',
+    url: '/api/v2/listtasksByPage',
     method: 'post',
     json: true,
     data: JSON.stringify(data),
@@ -35,7 +47,7 @@ export function getTaskByIds(data) {
     taskids: data
   }
   return request({
-    url: 'http://114.67.67.7:8080/api/v2/listtasks',
+    url: '/api/v2/listtasks',
     method: 'post',
     json: true,
     data: JSON.stringify(object),
@@ -55,7 +67,7 @@ export function removeTaskByIds(data) {
     taskids: data
   }
   return request({
-    url: 'http://114.67.67.7:8080/api/v2/removetask',
+    url: '/api/v2/removetask',
     method: 'post',
     json: true,
     data: JSON.stringify(object),
@@ -76,7 +88,7 @@ export function startTaskByIds(data, afresh) {
     afresh: afresh
   }
   return request({
-    url: 'http://114.67.67.7:8080/api/v2/starttask',
+    url: '/api/v2/starttask',
     method: 'post',
     json: true,
     data: JSON.stringify(object),
@@ -95,7 +107,7 @@ export function stopTaskByIds(data) {
     taskids: data
   }
   return request({
-    url: 'http://114.67.67.7:8080/api/v2/stoptask',
+    url: '/api/v2/stoptask',
     method: 'post',
     json: true,
     data: JSON.stringify(object),
@@ -106,8 +118,8 @@ export function stopTaskByIds(data) {
 }
 
 export function getDataParam(data, id) {
-  for (let i = 0; i < data.length ; i++) {
-    if( data[i].taskId === id ) {
+  for (let i = 0; i < data.length; i++) {
+    if ( data[i].taskId === id ) {
       return data[i]
     }
   }

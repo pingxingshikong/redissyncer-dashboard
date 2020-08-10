@@ -40,6 +40,9 @@
       <el-input v-if="byids" v-model="searchParam.taskids" placeholder="任务ID" style="width: 200px;"
                 class="filter-item"
                 @keyup.enter.native="handleFilter"/>
+      <el-input v-if="byGroupids" v-model="searchParam.groupIds" placeholder="任务组ID" style="width: 200px;"
+                class="filter-item"
+                @keyup.enter.native="handleFilter"/>
       <el-select v-if="bystatus" v-model="searchParam.taskstatus"  placeholder="任务状态" clearable
                  style="width: 200px"
                  class="filter-item">
@@ -182,7 +185,7 @@
         </el-form-item>
         <el-form-item prop="taskName" label="任务名称">
           <el-input
-            v-model="addTask.taskForm.taskname"
+            v-model="addTask.taskForm.taskName"
             placeholder="任务名称"
           ></el-input>
         </el-form-item>
@@ -428,7 +431,7 @@
 </template>
 
 <script>
-import { getTaskListByPage, getDataParam, removeTaskByIds, stopTaskByIds, startTaskByIds } from '@/api/syncer/tasklist'
+import { getTaskListByPage, createTask, getDataParam, removeTaskByIds, stopTaskByIds, startTaskByIds } from '@/api/syncer/tasklist'
 import waves from '@/directive/waves' // waves directive
 import { parseTime } from '@/utils'
 import Pagination from '@/components/Pagination'
@@ -537,7 +540,9 @@ export default {
         regulation: 'all',
         taskids: null,
         tasknames: null,
-        taskstatus: null
+        taskstatus: null,
+        groupIds: null
+
       },
       listParam: {
         title: '查询参数',
@@ -546,13 +551,15 @@ export default {
         pageSize: 10,
         taskids: null,
         tasknames: null,
-        taskstatus: null
+        taskstatus: null,
+        groupIds: null
       },
       jsonstr: null,
       drawer: false,
       obj: null,
       bynames: false,
       byids: false,
+      byGroupids: false,
       bystatus: false,
       labelPosition: 'left',
       importanceOptions: [1, 2, 3],
@@ -566,11 +573,12 @@ export default {
         ALL: "all",
         NAME: "bynames",
         IDS: "byids",
-        STATUS: "bystatus"
+        STATUS: "bystatus",
+        GroupIDS: "byGroupIds"
       },
       rowcontent: "",
       sortOptions: [{ label: 'ID Ascending', key: '+id' }, { label: 'ID Descending', key: '-id' }],
-      regulationOptions: ['all', 'bynames', 'byids', 'bystatus'],
+      regulationOptions: ['all', 'bynames', 'byids', 'bystatus', 'byGroupIds'],
       taskStatusOptions: ['creating', 'created', 'stop', 'run', 'pause', 'broken', 'rdbrunning', 'commandrunning'],
       startForm: {
         afresh: true,
@@ -594,23 +602,24 @@ export default {
       },
       addTask: {
         taskForm: {
-          autostart: true,
-          fileaddr: '',
+          fileAddress: '',
           tasktype: '',
-          taskname: '',
-          sourceaddr: '',
-          sourcepassword: '',
-          targetaddr: '',
-          targetpassword: '',
-          targetredisversion: ''
-
+          taskName: '',
+          sourceRedisAddress: '',
+          sourcePassword: '',
+          targetRedisAddress: '',
+          targetPassword: '',
+          targetRedisVersion: '',
+          autostart: true,
+          afresh: true,
+          batchSize: 1500
         },
         fromRedis: '',
         fromFile: '',
         tasktypeoptions: [
-          { value: 'total', label: '全量复制' },
-          { value: 'stockonly', label: '存量导入' },
-          { value: 'incrementonly', label: '增量导入' }
+          { value: 'total', label: '全部任务' },
+          { value: 'stockonly', label: '全量任务' },
+          { value: 'incrementonly', label: '增量任务' }
         ],
         targetRedisVersionOptions: [
           { value: '6.0', label: '6.0' },
@@ -725,7 +734,10 @@ export default {
           type: 'error'
         })
       }
-      this.listLoading = false
+      setTimeout(() => {
+        this.listLoading = false
+      }, 1 * 1000)
+      // this.listLoading = false
     },
     async startTask(id,afresh) {
       this.listLoading = true
@@ -741,7 +753,10 @@ export default {
           type: 'error'
         })
       }
-      this.listLoading = false
+      setTimeout(() => {
+        this.listLoading = false
+      }, 1 * 1000)
+      // this.listLoading = false
     },
     async stopTask(ids) {
       this.listLoading = true
@@ -785,7 +800,6 @@ export default {
           this.listParam.taskids = [this.searchParam.taskids]
         }
 
-
       }else if(this.searchParam.regulation==this.searchRegulation.STATUS){
         if(this.searchParam.taskstatus == null || this.searchParam.taskstatus == '' ){
           this.$message({
@@ -793,12 +807,21 @@ export default {
             type: 'error'
           })
           return null
-        }else{
+        }else {
           this.listParam.taskstatus = this.searchParam.taskstatus
-
+        }
+      } else if(this.searchParam.regulation==this.searchRegulation.GroupIDS) {
+          if (this.searchParam.groupIds == null || this.searchParam.groupIds == '') {
+            this.$message({
+              message: '任务组ID不能为空',
+              type: 'error'
+            })
+            return null
+          }else{
+            this.listParam.groupIds = [this.searchParam.groupIds]
+          }
         }
 
-      }
       this.listParam.regulation = this.searchParam.regulation
       this.getList()
 
@@ -874,8 +897,27 @@ export default {
       return statusMap[status]
     },
     createData() {
-      alert('确定')
 
+      this.$refs['taskForm'].validate((valid) => {
+        if (valid) {
+          // alert(JSON.stringify(this.addTask.taskForm))
+          createTask(this.addTask.taskForm).then(response => {
+            this.sleep(1500).then(() => {
+              this.getListWithOutLoading()
+            })
+            this.$notify({
+              title: '成功',
+              message: '创建成功',
+              type: 'success',
+              duration: 2000
+            })
+            setTimeout(() => {
+              this.listLoading = false
+            }, 1 * 1000)
+          })
+          this.add.dialogFormVisible = false
+        }
+      })
       // this.$refs['taskForm'].validate((valid) => {
       //   if (valid) {
       //     this.taskForm.id = parseInt(Math.random() * 100) + 1024 // mock a id
@@ -940,6 +982,7 @@ export default {
         var data = []
         data.push(rows.taskId)
         this.deleteTask(data)
+        this.getListWithOutLoading()
       }).catch(() => {
         //几点取消的提示
       })
@@ -958,6 +1001,7 @@ export default {
           type: 'warning'
         }).then(() => {
           this.startTask(this.startForm.rows.taskId,true)
+          this.getListWithOutLoading()
         }).catch(() => {
           //几点取消的提示
         })
@@ -974,6 +1018,7 @@ export default {
         var data = []
         data.push(rows.taskId)
         this.stopTask(data)
+        this.getListWithOutLoading()
       }).catch(() => {
         //几点取消的提示
       })
@@ -984,22 +1029,33 @@ export default {
         this.bynames = false
         this.byids = false
         this.bystatus = false
+        this.byGroupids = false
       }
       if (regulation === 'bynames') {
         this.bynames = true
         this.byids = false
         this.bystatus = false
+        this.byGroupids = false
       }
       if (regulation === 'byids') {
         this.bynames = false
         this.byids = true
         this.bystatus = false
+        this.byGroupids = false
       }
       if (regulation === 'bystatus') {
         this.bynames = false
         this.byids = false
         this.bystatus = true
+        this.byGroupids = false
       }
+      if (regulation === 'byGroupIds') {
+        this.bynames = false
+        this.byids = false
+        this.bystatus = false
+        this.byGroupids = true
+      }
+
     },
     handleImportFile() {
       // this.resetTemp()
@@ -1017,6 +1073,9 @@ export default {
       this.startTask(this.startForm.rows.taskId,this.startForm.afresh)
 
       this.add.dialogStartVisible = false
+    },
+    sleep(time) {
+      return new Promise((resolve) => setTimeout(resolve, time))
     }
 
   }

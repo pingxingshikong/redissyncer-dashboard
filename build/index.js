@@ -16,6 +16,7 @@ if (process.env.npm_config_preview || rawArgv.includes('--preview')) {
   var serveStatic = require('serve-static')
   const app = connect()
 
+
   app.use(
     publicPath,
     serveStatic('./dist', {

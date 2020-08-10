@@ -19,6 +19,8 @@ import './utils/error-log' // error log
 
 import * as filters from './filters' // global filters
 
+
+
 /**
  * If you don't want to use mock-server
  * you want to use MockJs for mock api
@@ -35,7 +37,9 @@ if (process.env.NODE_ENV === 'production') {
 Vue.use(Element, {
   size: Cookies.get('size') || 'medium' // set element-ui default size
 })
-
+//
+// Vue.use(SockJS)
+// Vue.use(Stomp)
 // register global utility filters
 Object.keys(filters).forEach(key => {
   Vue.filter(key, filters[key])
