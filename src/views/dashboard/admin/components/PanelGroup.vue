@@ -9,7 +9,7 @@
           <div class="card-panel-text">
             任务总数
           </div>
-          <count-to :start-val="0" :end-val="taskCount" :duration="2600" class="card-panel-num" />
+          <count-to :start-val="0" :end-val="taskCount" :duration="1500" class="card-panel-num" />
         </div>
       </div>
     </el-col>
@@ -22,7 +22,7 @@
           <div class="card-panel-text">
             正在运行任务
           </div>
-          <count-to :start-val="0" :end-val="runCount" :duration="3000" class="card-panel-num" />
+          <count-to :start-val="0" :end-val="runCount" :duration="1500" class="card-panel-num" />
         </div>
       </div>
     </el-col>
@@ -35,7 +35,7 @@
           <div class="card-panel-text">
             异常任务
           </div>
-          <count-to :start-val="0" :end-val="brokenCount" :duration="3200" class="card-panel-num" />
+          <count-to :start-val="0" :end-val="brokenCount" :duration="1500" class="card-panel-num" />
         </div>
       </div>
     </el-col>
@@ -48,7 +48,7 @@
           <div class="card-panel-text">
             停止的任务
           </div>
-          <count-to :start-val="0" :end-val="stopCount" :duration="3600" class="card-panel-num" />
+          <count-to :start-val="0" :end-val="stopCount" :duration="1500" class="card-panel-num" />
         </div>
       </div>
     </el-col>
