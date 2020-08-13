@@ -192,8 +192,8 @@ export const asyncRoutes = [
   // componentsRouter,
   // chartsRouter,
   syncerMenuRouter,
-  syncerMultiMenuRouter,
-  syncerMonitorMenuRouter,
+  // syncerMultiMenuRouter,
+  // syncerMonitorMenuRouter,
   // nestedRouter,
   // tableRouter,
 

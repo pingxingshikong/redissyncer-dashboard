@@ -778,14 +778,15 @@
       async deleteTask(ids) {
         this.listLoading = true
         const {data} = await removeTaskByIds(ids)
-        if (getDataParam(data, ids[0]).msg === 'Delete successful') {
+        const  deldatas=getDataParam(data, ids[0])
+        if (deldatas.msg === 'Delete successful') {
           this.$message({
             message: '删除任务成功',
             type: 'success'
           })
         } else {
           this.$message({
-            message: '删除任务成功',
+            message: '删除任务成功' +deldatas.msg,
             type: 'error'
           })
         }
@@ -798,14 +799,15 @@
         this.listLoading = true
 
         const {data} = await startTaskByIds(id, afresh)
-        if (getDataParam(data, id).msg === 'OK') {
+        const stopdatas=getDataParam(data, id);
+        if (stopdatas.msg === 'OK') {
           this.$message({
             message: '启动任务成功',
             type: 'success'
           })
         } else {
           this.$message({
-            message: '启动任务失败',
+            message: '启动任务失败' +stopdatas.msg,
             type: 'error'
           })
         }
@@ -817,14 +819,15 @@
       async stopTask(ids) {
         this.listLoading = true
         const {data} = await stopTaskByIds(ids)
-        if (getDataParam(data, ids[0]).msg === 'Task stopped successfully') {
+        const  stopdata = getDataParam(data, ids[0])
+        if (stopdata.msg === 'Task stopped successfully') {
           this.$message({
-            message: '停止任务成功',
+            message: '停止任务成功 ',
             type: 'success'
           })
         } else {
           this.$message({
-            message: '停止任务失败',
+            message: '停止任务失败 '+ stopdata.msg,
             type: 'error'
           })
         }
