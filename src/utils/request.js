@@ -56,7 +56,7 @@ service.interceptors.response.use(
     //   })
     // }
     // 50008: Illegal token; 50012: Other clients logged in; 50014: Token expired;
-    if (res.code === 100 || res.code === 50012 || res.code === 50014) {
+    if (response.status===403||res.code===403) {
       // to re-login
       MessageBox.confirm('You have been logged out, you can cancel to stay on this page, or log in again', 'Confirm logout', {
         confirmButtonText: 'Re-Login',
@@ -69,13 +69,16 @@ service.interceptors.response.use(
       })
     }
 
-    if (res.code !== '2000' && res.code !== 20000 && res.code !== '2000') {
+    if (res.code !== '2000' &&res.code !== '200' ||res.code==='1000') {
+
+      // return res
       Message({
         message: res.msg || 'Error',
         type: 'error',
         duration: 5 * 1000
       })
-      return Promise.reject(new Error(res.message || 'Error'))
+
+      return Promise.reject(new Error(res.msg || 'Error'))
     } else {
       return res
     }

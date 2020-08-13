@@ -207,43 +207,54 @@
           </el-select>
 
         </el-form-item>
-        <el-form-item prop="taskName" label="任务名称">
+
+        <el-form-item prop="taskName" >
+          <label style="display:inline-block; width: 120px;" ><span style="color:red;">* </span>任务名称 </label>
           <el-input
             v-model="addTask.taskForm.taskName"
-            placeholder="任务名称"
+            placeholder="任务名称" style="width: 60%"
           ></el-input>
         </el-form-item>
-        <el-form-item v-show="addTask.fromFile" prop="fileaddress" label="文件路径 ">
+        <el-form-item v-show="addTask.fromFile" prop="fileaddress" >
+          <label style="display:inline-block; width: 120px;"><span style="color:red;">* </span>文件路径</label>
+
           <el-input
             v-model="addTask.taskForm.fileAddress"
-            placeholder="http://127.0.0.1:8888/file/example.rdb"
+            placeholder="http://127.0.0.1:8888/file/example.rdb" style="width: 60%"
           ></el-input>
         </el-form-item>
-        <el-form-item v-show="addTask.fromRedis" prop="sourceRedisAddress" label="源redis地址">
+        <el-form-item v-show="addTask.fromRedis" prop="sourceRedisAddress">
+          <label style="display:inline-block; width: 120px;"><span style="color:red;">* </span>源redis地址 </label>
+
           <el-input
             v-model="addTask.taskForm.sourceRedisAddress"
-            placeholder="127.0.0.1:6379"
+            placeholder="127.0.0.1:6379" style="width: 60%"
           ></el-input>
         </el-form-item>
-        <el-form-item v-show="addTask.fromRedis" prop="sourcePassword" label="源redis密码">
+        <el-form-item v-show="addTask.fromRedis" prop="sourcePassword">
+          <label style="display:inline-block; width: 120px;">&nbsp;&nbsp;&nbsp;源redis密码 </label>
           <el-input
             v-model="addTask.taskForm.sourcePassword"
-            placeholder
+            placeholder style="width: 60%"
           ></el-input>
         </el-form-item>
-        <el-form-item prop="targetRedisAddress" label="目标redis地址">
+        <el-form-item prop="targetRedisAddress">
+          <label style="display:inline-block; width: 120px;"><span style="color:red;">* </span>目标redis地址 </label>
           <el-input
             v-model="addTask.taskForm.targetRedisAddress"
-            placeholder="127.0.0.1:6379" style="width: 50%"
+            placeholder="127.0.0.1:6379" style="width: 60%"
           ></el-input>
         </el-form-item>
-        <el-form-item prop="targetPassword" label="目标redi密码">
+        <el-form-item prop="targetPassword" >
+          <label style="display:inline-block; width: 120px;">&nbsp;&nbsp;&nbsp;目标redis密码 </label>
           <el-input
             v-model="addTask.taskForm.targetPassword"
-            placeholder
+            placeholder style="width: 60%"
           ></el-input>
         </el-form-item>
-        <el-form-item prop="targetRedisVersion" label="目标redis版本">
+        <el-form-item prop="targetRedisVersion" >
+
+          <label style="display:inline-block; width: 120px;"><span style="color:red;">* </span>目标redis版本 </label>
           <el-select v-model="addTask.taskForm.targetRedisVersion" placeholder @change="onSelectTasktype($event)">
             <el-option
               v-for="item in addTask.targetRedisVersionOptions"
@@ -253,10 +264,13 @@
             ></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item prop="autostart" label="是否自动启动">
+        <el-form-item prop="autostart" >
+          <label style="display:inline-block; width: 120px;"><span style="color:red;">* </span>是否自动启动 </label>
+
           <el-switch v-model="addTask.taskForm.autostart" active-text="自动启动" inactive-text="手动启动"></el-switch>
         </el-form-item>
       </el-form>
+      <center>
       <el-button type="primary" size="mini" @click="ResettaskForm">重置</el-button>
       <el-popover
         placement="top-start"
@@ -276,8 +290,8 @@
         </el-card>
         <el-button @click="onClickDrawer" type="info" slot="reference" size="mini">JSON</el-button>
       </el-popover>
-
-      <div slot="footer" class="dialog-footer">
+      </center>
+      <div slot="footer" class="dialog-footer" style="margin-top: -20px">
         <el-button @click="add.dialogFormVisible = false">
           取消
         </el-button>

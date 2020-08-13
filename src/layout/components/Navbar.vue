@@ -30,7 +30,7 @@
           <router-link to="/">
             <el-dropdown-item>返回首页</el-dropdown-item>
           </router-link>
-          <a target="_blank" href="https://github.com/PanJiaChen/vue-element-admin/">
+          <a  href="javascript:void(0)" @click="changepasswordDialogVisible = true">
             <el-dropdown-item>修改密码</el-dropdown-item>
           </a>
           <a target="_blank" href="https://panjiachen.github.io/vue-element-admin-site/#/">
@@ -41,8 +41,37 @@
           </el-dropdown-item>
         </el-dropdown-menu>
       </el-dropdown>
+
+      <el-dialog
+        title="修改密码"
+        :visible.sync="changepasswordDialogVisible"
+        width="30%">
+<!--        :before-close="handleClose">-->
+        <div>
+          <el-form
+            label-width="80px"
+          >
+
+          <el-form-item label="旧密码">
+            <el-input v-model="changeUser.password" placeholder="请输入旧密码"></el-input>
+          </el-form-item>
+            <el-form-item label="新密码">
+              <el-input v-model="changeUser.newPassword" placeholder="请输入旧密码"></el-input>
+            </el-form-item>
+            <el-form-item label="新密码">
+              <el-input v-model="changeUser.newPassword2" placeholder="请再次输入旧密码"></el-input>
+            </el-form-item>
+          </el-form>
+        </div>
+        <span slot="footer" class="dialog-footer">
+    <el-button @click="changepasswordDialogVisible = false">取 消</el-button>
+    <el-button type="primary" @click="changePasswordSubbmit()">确 定</el-button>
+  </span>
+      </el-dialog>
     </div>
   </div>
+
+
 </template>
 
 <script>
@@ -53,8 +82,20 @@ import ErrorLog from '@/components/ErrorLog'
 import Screenfull from '@/components/Screenfull'
 import SizeSelect from '@/components/SizeSelect'
 import Search from '@/components/HeaderSearch'
+import {changePassword} from "@/api/user";
+import {getTaskListByPage, startTaskByIds} from "@/api/syncer/tasklist";
 
 export default {
+  data() {
+    return {
+      changepasswordDialogVisible: false,
+      changeUser: {
+        password: '',
+        newPassword: '',
+        newPassword2: ''
+      }
+    }
+  },
   components: {
     Breadcrumb,
     Hamburger,
@@ -77,6 +118,55 @@ export default {
     async logout() {
       await this.$store.dispatch('user/logout')
       this.$router.push(`/login?redirect=${this.$route.fullPath}`)
+    },
+    handleClose(done) {
+      this.$confirm('确认关闭？')
+        .then(_ => {
+          done()
+        })
+        .catch(_ => {})
+    },
+    changePasswordSubbmit(){
+
+
+      if(this.changeUser.password==null||this.changeUser.password==''){
+        this.$message({
+          message: '旧密码不能为空',
+          type: 'error'
+        })
+        return
+      }
+      if(this.changeUser.newPassword==null||this.changeUser.newPassword==''){
+        this.$message({
+          message: '新密码不能为空',
+          type: 'error'
+        })
+        return
+      }
+      if(this.changeUser.newPassword2==null||this.changeUser.newPassword2==''){
+        this.$message({
+          message: '新密码不能为空',
+          type: 'error'
+        })
+        return
+      }
+      if(this.changeUser.newPassword!=this.changeUser.newPassword2){
+        this.$message({
+          message: '两次新密码输入不一致',
+          type: 'error'
+        })
+        return
+      }
+      changePassword(this.changeUser).then(response => {
+        if(response.code==='2000'){
+          this.$message({
+            message: response.msg,
+            type: 'success'
+          })
+          this.changepasswordDialogVisible = false
+        }
+      })
+
     }
   }
 }

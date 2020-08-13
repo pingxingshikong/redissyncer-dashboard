@@ -12,7 +12,7 @@
   </div>
 </template>
 
-<script>
+<script>/**
   import SockJS from 'sockjs-client'
   import Stomp from 'stompjs'
 
@@ -83,6 +83,8 @@
         }
       }
     }
+
+  **/
 </script>
 
 <style scoped>
