@@ -12,6 +12,18 @@ export function createTask(data) {
   })
 }
 
+export function createImportFileTask(data) {
+  return request({
+    url: '/api/v2/file/createtask',
+    method: 'post',
+    json: true,
+    data: JSON.stringify(data),
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  })
+}
+
 export function getTaskList(data) {
   return request({
     url: '/api/v2/listtasks',

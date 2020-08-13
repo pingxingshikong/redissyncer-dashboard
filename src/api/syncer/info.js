@@ -6,3 +6,13 @@ export function getDashBoard() {
     method: 'post'
   })
 }
+
+export function getDashBoardChart() {
+  return request({
+    url: '/info/chardashboardInfo',
+    method: 'post'
+  })
+}
+
+
+
