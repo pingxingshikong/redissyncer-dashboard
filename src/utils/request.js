@@ -6,7 +6,7 @@ import { getToken } from '@/utils/auth'
 // create an axios instance
 const service = axios.create({
   // baseURL: 'http://127.0.0.1:8080', // url = base url + request url
-  baseURL: '/api', // url = base url + request url
+  baseURL: '/backend', // url = base url + request url
   // withCredentials: true, // send cookies when cross-domain requests
   timeout: 5000 // request timeout
 })
@@ -55,7 +55,7 @@ service.interceptors.response.use(
     //   })
     // }
     // 50008: Illegal token; 50012: Other clients logged in; 50014: Token expired;
-    if (response.status===403||res.code==='403') {
+    if (response.status === 403 || res.code === '403') {
       // to re-login
       MessageBox.confirm('You have been logged out, you can cancel to stay on this page, or log in again', 'Confirm logout', {
         confirmButtonText: 'Re-Login',
@@ -68,8 +68,7 @@ service.interceptors.response.use(
       })
     }
 
-    if (res.code !== '2000' &&res.code !== '200' ||res.code==='1000') {
-
+    if (res.code !== '2000' && res.code !== '200' || res.code === '1000') {
       // return res
       Message({
         message: res.msg || 'Error',

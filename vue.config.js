@@ -33,14 +33,14 @@ module.exports = {
     port: port,
     open: true,
     proxy: {
-      '/api': {
+      '/backend': {
         // target: 'http://114.67.67.7:8080',
         target: 'http://127.0.0.1:8080',
         ws: true,
         changOrigin: true,    //是否开启代理
         secure: false,
         pathRewrite: {
-          '^/api': '' //通配符
+          '^/backend': '' //通配符
         }
       }
     },
