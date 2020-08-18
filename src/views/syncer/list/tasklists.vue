@@ -157,7 +157,7 @@
 
     </el-table>
 
-    <pagination v-show="total>0" :total="total" :page.sync="listParam.currentPage" :limit.sync="listParam.pageSize"
+    <pagination v-show="total>0" :page-sizes="[5, 10, 20, 30,50]" :total="total" :page.sync="listParam.currentPage" :limit.sync="listParam.pageSize"
                 @pagination="getList"/>
 
 
@@ -593,7 +593,7 @@
           title: '查询参数',
           regulation: 'all',
           currentPage: 1,
-          pageSize: 10,
+          pageSize: 5,
           taskids: null,
           tasknames: null,
           taskstatus: null,
@@ -738,7 +738,9 @@
     },
     mounted() {
       // 设置定时器，每3秒刷新一次
-      // this.timer = setInterval(getListData,1000)
+      // this.timer = setInterval(this.getListWithOutLoading(),3000)
+
+      this.timer = setInterval(this.getListWithOutLoading,3000)
       // function getListData() {
       //   const { data } = getTaskList({ regulation: 'all' })
       //   // alert(JSON.stringify(data))
@@ -748,9 +750,9 @@
       // getListData()
     },
     watch: {
-      list() {
-        this.timer()
-      }
+      // list() {
+      //   this.timer()
+      // }
     },
     destroyed() {
       clearTimeout(this.timer)
@@ -786,8 +788,10 @@
           })
         } else {
           this.$message({
+            showClose: true,
             message: '删除任务成功' +deldatas.msg,
-            type: 'error'
+            type: 'error',
+            duration: 5000
           })
         }
         setTimeout(() => {
@@ -807,8 +811,10 @@
           })
         } else {
           this.$message({
+            showClose: true,
             message: '启动任务失败' +stopdatas.msg,
-            type: 'error'
+            type: 'error',
+            duration: 5000
           })
         }
         setTimeout(() => {
@@ -827,8 +833,10 @@
           })
         } else {
           this.$message({
+            showClose: true,
             message: '停止任务失败 '+ stopdata.msg,
-            type: 'error'
+            type: 'error',
+            duration: 5000
           })
         }
         this.listLoading = false
