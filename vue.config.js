@@ -40,7 +40,7 @@ module.exports = {
         changOrigin: true,    //是否开启代理
         secure: false,
         pathRewrite: {
-          '^/api': '' //通配符
+          '^/backend': '' //通配符
         }
       }
     },
