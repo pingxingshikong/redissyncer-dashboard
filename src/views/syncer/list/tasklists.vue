@@ -100,18 +100,18 @@
 
       <el-table-column label="源Redis节点地址" min-width="170px">
         <template slot-scope="{row}">
-          <span class="link-type">{{ row.sourceRedisAddress }}</span>
+          <span class="link-type" >{{sourceAddressFilter(row.sourceRedisAddress,row.fileAddress)}}</span>
         </template>
       </el-table-column>
 
-      <el-table-column label="Type" class-name="status-col" width="120">
+      <el-table-column label="Type" class-name="status-col" width="200">
         <template slot-scope="{row}">
           <el-popover
             placement="top-start"
             width="200"
             trigger="hover"
-            content="右上角百分比为[全量同步]进度">
-            <el-badge :value="row.rate2Int+'%'" class="item" slot="reference" :type=" row.status| jinduFilter ">
+            content="右上角百分比为[全量同步]进度/命令数量">
+            <el-badge :value="rdbjinduFilter(row)" class="item" slot="reference" :type=" row.status| jinduFilter ">
               <el-tag type="success">
                 {{ row.syncType | syncTypeFilter }}
               </el-tag>
@@ -547,6 +547,8 @@
         }
         return statusMap[status]
       },
+
+
       deleteButtionStatus(status) {
         const statusMap = {
           CREATING: true,
@@ -1229,6 +1231,19 @@
       },
       sleep(time) {
         return new Promise((resolve) => setTimeout(resolve, time))
+      },
+      rdbjinduFilter(rows){
+        if(rows.syncType === 'SYNC'){
+          return rows.rate2Int+'%'
+        }else{
+          return rows.allKeyCount
+        }
+      },
+      sourceAddressFilter(sourceRedisAddress,fileAddress) {
+        if(sourceRedisAddress==null || sourceRedisAddress===''){
+          return fileAddress
+        }
+        return sourceRedisAddress
       }
 
     }
