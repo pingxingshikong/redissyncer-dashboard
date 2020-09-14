@@ -264,6 +264,50 @@
             ></el-option>
           </el-select>
         </el-form-item>
+        <el-form-item style="width: 70%">
+          <p style="color: red">注意：不配置db映射关系同步任务将会将源Redis节点全部数据按原有规则同步至目标节点</p>
+          <p style="color: red">注意：配置db映射关系后 如：{0：1} 同步任务仅会将源Redis db0库内的数据同步至目标redis节点db1库,源Redis节点其他db库内的数据将会自动抛弃</p>
+          <p style="color: red">注意：配置db映射关系后目标为cluster或者仅有一个db0库的proxy集群时，同步任务会将源节点符合映射关系的数据同步至db0库</p>
+          <el-button @click="clearAllDbMapper()">清除所有映射关系</el-button>
+          <el-table
+            :data="tableData"
+            style="width: 100%">
+            <el-table-column
+              label="DB映射关系">
+            </el-table-column>
+            <el-table-column
+              label="源DB"
+              prop="source">
+            </el-table-column>
+            <el-table-column
+              label="目标DB"
+              prop="target">
+            </el-table-column>
+            <el-table-column >
+<!--              <template slot="header" slot-scope="scope">-->
+<!--                <el-input-->
+<!--                  v-model="search"-->
+<!--                  size="mini"-->
+<!--                  placeholder="输入关键字搜索"/>-->
+<!--              </template>-->
+
+                <template slot="header" slot-scope="scope">
+                  <el-button  plain @click="test()">添加</el-button>
+                </template>
+
+              <template slot-scope="scope">
+<!--                <el-button-->
+<!--                  size="mini"-->
+<!--                  @click="handleEdit(scope.$index, scope.row)">Edit</el-button>-->
+                <el-button
+                  size="mini"
+                  type="danger"
+                  @click="handleDbMapperDelete(scope.$index, scope.row)">删除</el-button>
+              </template>
+            </el-table-column>
+          </el-table>
+        </el-form-item>
+
         <el-form-item prop="autostart" >
           <label style="display:inline-block; width: 120px;"><span style="color:red;">* </span>是否自动启动 </label>
 
@@ -392,6 +436,13 @@
               <span>{{showTask.temp.taskMsg}}</span>
             </div>
 
+
+            <div>
+              <el-divider content-position="left"></el-divider>
+              <el-tag>异常信息:</el-tag>
+              <el-divider direction="vertical"></el-divider>
+              <span>{{showTask.temp.brokenReason}}</span>
+            </div>
             <div>
               <el-divider content-position="left"></el-divider>
               <el-tag>offset记录值:</el-tag>
@@ -464,6 +515,37 @@
       </div>
     </el-dialog>
 
+<!--    dbmapper映射弹窗-->
+    <el-dialog :title="textMap[dialogStatus]" :visible.sync="showDbMapper.showV">
+      <div>
+        <div style="height:300px;">
+          <el-form
+            ref="dbMapperForm"
+            :model="showDbMapper"
+            :rules="addTask.taskrules.dbMapperrules"
+            :label-position="labelPosition"
+            label-width="100px"
+          >
+            <el-form-item prop="source"  label="源db库">
+              <el-input
+                v-model="showDbMapper.source" type="number"
+                placeholder="源db库"
+              ></el-input>
+            </el-form-item>
+            <el-form-item prop="target"   label="目标db库">
+              <el-input
+                v-model="showDbMapper.target" type="number"
+                placeholder="目标db库"
+              ></el-input>
+            </el-form-item>
+          </el-form>
+          <div slot="footer" class="dialog-footer">
+            <el-button type="primary" @click="ResetdbMapperForm">重置</el-button>
+            <el-button type="primary" @click="addDbMapperData">提交</el-button>
+          </div>
+        </div>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -541,7 +623,7 @@
           CREATED: 'info',
           STOP: 'info',
           RDBRUNING: 'danger',
-          COMMANDRUNING: 'info',
+          COMMANDRUNING: 'warning',
           RUN: 'info',
           BROKEN: 'info'
         }
@@ -658,6 +740,7 @@
             targetRedisAddress: '',
             targetPassword: '',
             targetRedisVersion: '',
+            dbMapper: { },
             autostart: true,
             afresh: true,
             batchSize: 1500
@@ -691,7 +774,11 @@
             sourceFile: [{required: true, message: '文件地址不能为空', trigger: 'blur'}],
             tasktype: [{required: true, message: '请选择任务类型', trigger: 'blur'}],
             sourceaddr: [{required: true, message: '源地址不能为空', trigger: 'blur'}],
-            targetaddr: [{required: true, message: '目标地址不能为空', trigger: 'blur'}]
+            targetaddr: [{required: true, message: '目标地址不能为空', trigger: 'blur'}],
+            dbMapperrules: {
+              source: [{ required: true, message: '源db不能为空', trigger: 'blur' }],
+              target: [{ required: true, message: '目标db不能为空', trigger: 'blur' }]
+            }
           }
         },
         showTask: {
@@ -709,6 +796,7 @@
             tasktype: '',
             offsetPlace: '',
             taskMsg: '',
+            brokenReason: '',
             offset: -1,
             status: '',
             redisVersion: '',
@@ -722,12 +810,19 @@
             rate2Int: 0
           }]
         },
+        showDbMapper: {
+          showV: false,
+          source: '',
+          target: ''
+        },
         dialogStatus: '',
         textMap: {
           update: 'Edit',
           create: '创建同步任务',
           showTaskData: '任务详情'
-        }
+        },
+        tableData: [],
+        search: ''
       }
     },
     created() {
@@ -929,6 +1024,11 @@
         this.$refs['taskForm'].resetFields()
         this.jsonstr = null
       },
+
+      ResetdbMapperForm() {
+        // 重置添加表单
+        this.$refs['dbMapperForm'].resetFields()
+      },
       onClickDrawer() {
         const object = {}
         object['tasktype'] = this.addTask.taskForm.tasktype
@@ -945,6 +1045,7 @@
         // this.jsonstr = object;
       },
       handleCreate() {
+        this.tableData=[]
         this.addTask.taskForm.synctype = this.addTask.synctypeoptions[0].label
         this.addTask.taskForm.tasktype = this.addTask.tasktypeoptions[0].label
 
@@ -953,6 +1054,7 @@
         this.add.dialogFormVisible = true
         this.addTask.fromRedis = true
         this.addTask.fromFile = false
+
         this.$nextTick(() => {
           this.$refs['taskForm'].clearValidate()
         })
@@ -1004,6 +1106,14 @@
                 return
               }
 
+
+
+              var dataes=this.tableData
+              for(var i=0;i<dataes.length;i++){
+                // teste.push(this.tableData[i].source,this.tableData[i].target)
+                this.addTask.taskForm.dbMapper[dataes[i].source] =dataes[i].target
+              }
+
               createTask(this.addTask.taskForm).then(response => {
                 this.sleep(1500).then(() => {
                   this.getListWithOutLoading()
@@ -1015,6 +1125,8 @@
                   duration: 2000
                 })
                 this.add.dialogFormVisible = false
+                this.addTask.taskForm.dbMapper = { }
+                this.tableData = []
                 setTimeout(() => {
                   this.listLoading = false
                 }, 1 * 1000)
@@ -1138,6 +1250,41 @@
           //几点取消的提示
         })
       },
+
+      handleDbMapperDelete(index , rows) {
+        // 删除任务信息
+        this.$confirm('此操作将删除该映射关系, 是否继续?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          this.tableData.splice(index, 1)
+
+        }).catch(() => {
+          //几点取消的提示
+        })
+      },
+      addDbMapperData(){
+        this.$refs['dbMapperForm'].validate((valid) => {
+          if (valid) {
+            var dataes=this.tableData
+            dataes.push({
+              source: this.showDbMapper.source,
+              target: this.showDbMapper.target
+            })
+            this.showDbMapper.source = ''
+            this.showDbMapper.target= ''
+            this.showDbMapper.showV=false
+            // for(var i=0;i<dataes.length;i++){
+            //   teste[dataes[i].source] =dataes[i].target
+            // }
+            // console.log(JSON.stringify(teste))
+            // alert(JSON.stringify(teste))
+
+
+          }
+        })
+      },
       handleStartTask(rows) {
         // 启动任务信息
         if (rows.offset > -1) {
@@ -1233,6 +1380,12 @@
         return new Promise((resolve) => setTimeout(resolve, time))
       },
       rdbjinduFilter(rows){
+        if(rows.syncType === 'SYNC' && rows.status === 'RDBRUNING'){
+          return 99+'%'
+        }
+        if(rows.status === 'COMMANDRUNING'){
+          return rows.allKeyCount
+        }
         if(rows.syncType === 'SYNC'){
           return rows.rate2Int+'%'
         }else{
@@ -1244,6 +1397,12 @@
           return fileAddress
         }
         return sourceRedisAddress
+      },test(){
+
+        this.showDbMapper.showV=true
+
+      },clearAllDbMapper(){
+        this.tableData=[]
       }
 
     }
