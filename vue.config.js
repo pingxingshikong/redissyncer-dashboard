@@ -35,7 +35,7 @@ module.exports = {
     proxy: {
       '/api': {
         // target: 'http://114.67.67.7:8080',
-        target: 'http://127.0.0.1:8080',
+        target: 'http://127.0.0.1:8081',
         ws: true,
         changOrigin: true,    //是否开启代理
         secure: false,

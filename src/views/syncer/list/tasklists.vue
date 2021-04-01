@@ -234,9 +234,11 @@
         <el-form-item v-show="addTask.fromRedis" prop="sourcePassword">
           <label style="display:inline-block; width: 120px;">&nbsp;&nbsp;&nbsp;源redis密码 </label>
           <el-input
+            :type="sourcePassw"
             v-model="addTask.taskForm.sourcePassword"
-            placeholder style="width: 60%"
-          ></el-input>
+            placeholder style="width: 60%">
+            <i slot="suffix" :class="iconSourcePassword" @click="showPassSource()"></i>
+          </el-input>
         </el-form-item>
         <el-form-item prop="targetRedisAddress">
           <label style="display:inline-block; width: 120px;"><span style="color:red;">* </span>目标redis地址 </label>
@@ -248,9 +250,11 @@
         <el-form-item prop="targetPassword" >
           <label style="display:inline-block; width: 120px;">&nbsp;&nbsp;&nbsp;目标redis密码 </label>
           <el-input
+            :type="targetPassw"
             v-model="addTask.taskForm.targetPassword"
-            placeholder style="width: 60%"
-          ></el-input>
+            placeholder style="width: 60%">
+            <i slot="suffix" :class="iconTargetPassword" @click="showPassTarget()"></i>
+            </el-input>
         </el-form-item>
         <el-form-item prop="targetRedisVersion" >
 
@@ -586,9 +590,10 @@
           CREATING: 'info',
           CREATED: 'info',
           STOP: 'info',
-          RDBRUNING: 'success',
-          COMMANDRUNING: 'success',
-          RUN: 'success',
+          RDBRUNNING: 'success',
+          COMMANDRUNNING: 'success',
+          STARTING: 'success',
+		      FINISH: 'INFO',
           BROKEN: 'danger'
         }
         return statusMap[status]
@@ -598,10 +603,11 @@
           CREATING: '正在创建',
           CREATED: '创建完成',
           STOP: '任务停止',
-          RDBRUNING: '全量同步进行中',
-          COMMANDRUNING: '增量同步进行中',
-          RUN: '任务运行成功',
-          BROKEN: '任务异常'
+          RDBRUNNING: '全量同步进行中',
+          COMMANDRUNNING: '增量同步进行中',
+          STARTING: '任务启动中',
+          BROKEN: '任务异常',
+		      FINISH: '任务完成',
         }
         return statusMap[status]
       },
@@ -610,9 +616,10 @@
           CREATING: 'info',
           CREATED: 'info',
           STOP: 'danger',
-          RDBRUNING: 'info',
-          COMMANDRUNING: 'info',
-          RUN: 'info',
+          RDBRUNNING: 'info',
+          COMMANDRUNNING: 'info',
+          STARTING: 'info',
+		      FINISH: 'danger',
           BROKEN: 'danger'
         }
         return statusMap[status]
@@ -622,10 +629,11 @@
           CREATING: 'info',
           CREATED: 'info',
           STOP: 'info',
-          RDBRUNING: 'danger',
-          COMMANDRUNING: 'warning',
-          RUN: 'info',
-          BROKEN: 'info'
+          RDBRUNNING: 'danger',
+          COMMANDRUNNING: 'warning',
+          STARTING: 'info',
+          BROKEN: 'info',
+          FINISH: 'info'
         }
         return statusMap[status]
       },
@@ -636,8 +644,8 @@
           CREATING: true,
           CREATED: true,
           STOP: false,
-          RDBRUNING: true,
-          COMMANDRUNING: true,
+          RDBRUNNING: true,
+          COMMANDRUNNING: true,
           RUN: true,
           BROKEN: false
         }
@@ -661,6 +669,12 @@
     },
     data() {
       return {
+        //用于改变Input类型
+        sourcePassw:"password",
+        targetPassw:"password",
+        //用于更换Input中的图标
+        iconSourcePassword:"el-input__icon el-icon-view",
+        iconTargetPassword:"el-input__icon el-icon-view",
         tableKey: 0,
         list: null,
         total: 0,
@@ -708,7 +722,7 @@
         rowcontent: "",
         sortOptions: [{label: 'ID Ascending', key: '+id'}, {label: 'ID Descending', key: '-id'}],
         regulationOptions: ['all', 'bynames', 'byids', 'bystatus', 'byGroupIds'],
-        taskStatusOptions: ['creating', 'created', 'stop', 'run', 'pause', 'broken', 'rdbrunning', 'commandrunning'],
+        taskStatusOptions: ['creating', 'created', 'stop', 'starting', 'finish', 'broken', 'rdbrunning', 'commandrunning'],
         startForm: {
           afresh: true,
           rows: null
@@ -732,8 +746,8 @@
         addTask: {
           taskForm: {
             fileAddress: '',
-            tasktype: '',
-            synctype: '',
+            tasktype: 'total',
+            synctype: 'SYNC',
             taskName: '',
             sourceRedisAddress: '',
             sourcePassword: '',
@@ -752,6 +766,7 @@
             {value: 'stockonly', label: '全量数据'},
             {value: 'incrementonly', label: '增量实时数据'}
           ],
+
           synctypeoptions: [
             {value: 'SYNC', label: '在线同步'},
             {value: 'RDB', label: 'RDB数据文件导入'},
@@ -762,6 +777,7 @@
             {value: 'ONLINEMIXED', label: '在线混合数据文件导入'}
           ],
           targetRedisVersionOptions: [
+			{value: '6.2', label: '6.2'},
             {value: '6.0', label: '6.0'},
             {value: '5.0', label: '5.0'},
             {value: '4.0', label: '4.0'},
@@ -1037,8 +1053,7 @@
         object['sourcepassword'] = this.addTask.taskForm.sourcepassword
         object['targetaddress'] = this.addTask.taskForm.targetaddress
         object['targetpassword'] = this.addTask.taskForm.targetpassword
-        object[
-          'targetRedisVersionOptions'] = this.addTask.taskForm.targetRedisVersionOptions
+        object['targetRedisVersionOptions'] = this.addTask.taskForm.targetRedisVersionOptions
         object['autostart'] = this.addTask.taskForm.autostart
         this.drawer = true
         this.rowcontent = JSON.stringify(object, undefined, 2)
@@ -1064,10 +1079,11 @@
           CREATING: false,
           CREATED: false,
           STOP: true,
-          RDBRUNING: false,
-          COMMANDRUNING: false,
-          RUN: false,
-          BROKEN: true
+          RDBRUNNING: false,
+          COMMANDRUNNING: false,
+          STARTING: false,
+          BROKEN: true,
+          FINISH: true
         }
         return statusMap[status]
       },
@@ -1076,16 +1092,22 @@
           CREATING: true,
           CREATED: true,
           STOP: false,
-          RDBRUNING: true,
-          COMMANDRUNING: true,
-          RUN: true,
-          BROKEN: false
+          RDBRUNNING: true,
+          COMMANDRUNNING: true,
+          STARTING: true,
+          BROKEN: false,
+          FINISH: false
         }
         return statusMap[status]
       },
       createData() {
 
-
+      if(this.addTask.taskForm.synctype==="在线同步"){
+        this.addTask.taskForm.synctype="SYNC"
+      }
+      if(this.addTask.taskForm.tasktype==="全部数据"){
+        this.addTask.taskForm.tasktype="total"
+      }
         // alert(JSON.stringify(this.addTask.taskForm))
 
         if (this.addTask.fromRedis === true && this.addTask.fromFile === false) {
@@ -1292,21 +1314,40 @@
           this.startForm.afresh = rows.afresh
           this.add.dialogStartVisible = true
         } else {
-          // 删除任务信息
-          this.$confirm('此操作将启动该同步任务, 是否继续?', '提示', {
-            confirmButtonText: '确定',
-            cancelButtonText: '取消',
-            type: 'warning'
-          }).then(() => {
-            this.startTask(rows.taskId, true)
-            this.getListWithOutLoading()
-          }).catch(() => {
-            this.$message({
-              message: '取消启动任务成功',
-              type: 'success'
+          if(rows.status=="FINISH"){
+            // 删除任务信息
+            this.$confirm('本任务已经被执行完成过，此操作将再次执行该同步任务可能会导致数据重复, 是否继续?', '提示', {
+              confirmButtonText: '确定',
+              cancelButtonText: '取消',
+              type: 'error'
+            }).then(() => {
+              this.startTask(rows.taskId, true)
+              this.getListWithOutLoading()
+            }).catch(() => {
+              this.$message({
+                message: '取消再次启动任务成功',
+                type: 'success'
+              })
+              //几点取消的提示
             })
-            //几点取消的提示
-          })
+          }else{
+            // 删除任务信息
+            this.$confirm('此操作将启动该同步任务, 是否继续?', '提示', {
+              confirmButtonText: '确定',
+              cancelButtonText: '取消',
+              type: 'warning'
+            }).then(() => {
+              this.startTask(rows.taskId, true)
+              this.getListWithOutLoading()
+            }).catch(() => {
+              this.$message({
+                message: '取消启动任务成功',
+                type: 'success'
+              })
+              //几点取消的提示
+            })
+          }
+
 
         }
       },
@@ -1370,6 +1411,32 @@
         //   this.$refs["taskForm"].resetFields()
         // })
       },
+
+      //密码的隐藏和显示
+      showPassSource(){
+      　//点击图标是密码隐藏或显示
+        if(this.sourcePassw=="text"){
+            this.sourcePassw="password";
+           //更换图标
+           this.iconSourcePassword="el-input__icon el-icon-view";
+         }else {
+           this.sourcePassw="text";
+           this.iconSourcePassword="el-input__icon el-icon-loading";
+         };
+       },
+
+      //密码的隐藏和显示
+      showPassTarget(){
+      　//点击图标是密码隐藏或显示
+        if(this.targetPassw=="text"){
+            this.targetPassw="password";
+           //更换图标
+           this.iconTargetPassword="el-input__icon el-icon-view";
+         }else {
+           this.targetPassw="text";
+           this.iconTargetPassword="el-input__icon el-icon-loading";
+         };
+       },
       startTaskByButton() {
 
         this.startTask(this.startForm.rows.taskId, this.startForm.afresh)
@@ -1380,10 +1447,10 @@
         return new Promise((resolve) => setTimeout(resolve, time))
       },
       rdbjinduFilter(rows){
-        if(rows.syncType === 'SYNC' && rows.status === 'RDBRUNING'){
-          return 99+'%'
+        if(rows.syncType === 'SYNC' && rows.status === 'RDBRUNNING'){
+          return rows.rate2Int+'%'
         }
-        if(rows.status === 'COMMANDRUNING'){
+        if(rows.status === 'COMMANDRUNNING'){
           return rows.allKeyCount
         }
         if(rows.syncType === 'SYNC'){
