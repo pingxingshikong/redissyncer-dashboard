@@ -109,8 +109,8 @@ export default {
         CREATING: 'info',
         CREATED: 'info',
         STOP: 'danger',
-        RDBRUNING: 'info',
-        COMMANDRUNING: 'info',
+        RDBRUNNING: 'info',
+        COMMANDRUNNING: 'info',
         RUN: 'info',
         BROKEN: 'danger'
       }
@@ -229,7 +229,7 @@ export default {
     async insertRDBTask(row) {
       this.listLoading = true
       const res = await insertRdbList(row)
-      if (res.msg === 'success') {
+      if (res.msg === 'request is successful') {
         this.addRdbData.dialogFormVisible = false
         this.addRdbData.taskForm.rdb_version = null
         this.addRdbData.taskForm.redis_version = null
@@ -324,10 +324,21 @@ export default {
     handleDelete(rows, index) {
       // 删除任务信息
 
-      this.deleteRDBTask(rows, index)
+      this.$confirm('此操作将删除该映射关系, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        // 删除任务信息
+        this.deleteRDBTask(rows, index)
+      }).catch(() => {
+        //几点取消的提示
+      })
+      
+      
     },
     handleUpdate(rows, index) {
-      // 删除任务信息
+       // 删除任务信息
       this.dialogStatus = 'update'
       this.addRdbData.taskForm.id = rows.id
       this.addRdbData.taskForm.rdb_version = rows.rdb_version

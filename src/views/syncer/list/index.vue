@@ -319,8 +319,8 @@
           RUN: "primary",
           PAUSE: "success",
           BROKEN: "warning",
-          RDBRUNING: "primary",
-          COMMANDRUNING: "primary"
+          RDBRUNNING: "primary",
+          COMMANDRUNNING: "primary"
         }
         return statusMap[status]
       },
@@ -431,7 +431,7 @@
         this.jsonstr = null;
       },
       IsRunningStatus(status) {
-        const runningstatus = ["COMMANDRUNING", "RDBRUNING", "RUN"]
+        const runningstatus = ["COMMANDRUNNING", "RDBRUNNING", "STARTING"]
         if (runningstatus.indexOf(status) == -1) {
           return false
         }
