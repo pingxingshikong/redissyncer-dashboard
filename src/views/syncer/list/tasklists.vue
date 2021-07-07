@@ -655,6 +655,7 @@ export default {
         STOP: 'info',
         RDBRUNNING: 'success',
         COMMANDRUNNING: 'success',
+        COMMANDRUNING: 'success',
         STARTING: 'success',
 		      FINISH: 'INFO',
         BROKEN: 'danger'
@@ -668,6 +669,7 @@ export default {
         STOP: '任务停止',
         RDBRUNNING: '全量同步进行中',
         COMMANDRUNNING: '增量同步进行中',
+        COMMANDRUNING: '增量同步进行中',
         STARTING: '任务启动中',
         BROKEN: '任务异常',
 		      FINISH: '任务完成'
@@ -681,6 +683,7 @@ export default {
         STOP: 'danger',
         RDBRUNNING: 'info',
         COMMANDRUNNING: 'info',
+        COMMANDRUNING: 'info',
         STARTING: 'info',
 		      FINISH: 'danger',
         BROKEN: 'danger'
@@ -694,6 +697,7 @@ export default {
         STOP: 'info',
         RDBRUNNING: 'danger',
         COMMANDRUNNING: 'warning',
+        COMMANDRUNING: 'warning',
         STARTING: 'info',
         BROKEN: 'info',
         FINISH: 'info'
@@ -708,6 +712,7 @@ export default {
         STOP: false,
         RDBRUNNING: true,
         COMMANDRUNNING: true,
+        COMMANDRUNING: true,
         RUN: true,
         BROKEN: false
       }
@@ -1141,6 +1146,7 @@ export default {
         STOP: true,
         RDBRUNNING: false,
         COMMANDRUNNING: false,
+        COMMANDRUNING: false,
         STARTING: false,
         BROKEN: true,
         FINISH: true
@@ -1154,6 +1160,7 @@ export default {
         STOP: false,
         RDBRUNNING: true,
         COMMANDRUNNING: true,
+        COMMANDRUNING: true,
         STARTING: true,
         BROKEN: false,
         FINISH: false
@@ -1494,7 +1501,12 @@ export default {
       if (rows.syncType === 'SYNC' && rows.status === 'RDBRUNNING') {
         return rows.rate2Int + '%'
       }
+      
+     
       if (rows.status === 'COMMANDRUNNING') {
+        return rows.allKeyCount
+      }
+      if (rows.status === 'COMMANDRUNING') {
         return rows.allKeyCount
       }
       if (rows.syncType === 'SYNC') {
