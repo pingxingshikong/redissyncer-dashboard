@@ -1501,8 +1501,7 @@ export default {
       if (rows.syncType === 'SYNC' && rows.status === 'RDBRUNNING') {
         return rows.rate2Int + '%'
       }
-      
-     
+
       if (rows.status === 'COMMANDRUNNING') {
         return rows.allKeyCount
       }
