@@ -1,7 +1,7 @@
 <template>
   <div class="app-container">
     <div class="filter-container">
-      <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit"   @click="handleCreate" >
+      <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">
         新建映射关系
       </el-button>
     </div>
@@ -14,10 +14,9 @@
       fit
       highlight-current-row
       style="width: 100%;"
-
     >
       <!--      @sort-change="sortChange"-->
-      <el-table-column label="映射ID"  width="210px"  align="center" >
+      <el-table-column label="映射ID" width="210px" align="center">
         <template slot-scope="{row}">
           <span>{{ row.id }}</span>
         </template>
@@ -29,7 +28,7 @@
       </el-table-column>
       <el-table-column label="RDB版本" width="255px" align="center">
         <template slot-scope="{row}">
-                    <!--<span>{{ row.createTime | parseTime('{y}-{m}-{d} {h}:{i}') }}</span>-->
+          <!--<span>{{ row.createTime | parseTime('{y}-{m}-{d} {h}:{i}') }}</span>-->
           <span>{{ row.rdb_version }}</span>
         </template>
       </el-table-column>
@@ -39,7 +38,7 @@
           <el-button type="primary" size="mini" @click="handleUpdate(row, $index)">
             编辑
           </el-button>
-          <el-button  size="mini" type="danger"  @click="handleDelete(row, $index)">
+          <el-button size="mini" type="danger" @click="handleDelete(row, $index)">
             删除
           </el-button>
         </template>
@@ -50,26 +49,27 @@
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="addRdbData.dialogFormVisible">
       <div>
         <div style="height:300px;">
-            <el-form
-              ref="taskForm"
-              :model="addRdbData.taskForm"
-              :rules="addRdbData.rdbrules"
-              :label-position="labelPosition"
-              label-width="100px"
-            >
-              <el-form-item prop="redis_version"  label="Redis版本">
-                <el-input
-                  v-model="addRdbData.taskForm.redis_version"
-                  placeholder="Redis版本"
-                ></el-input>
-              </el-form-item>
-              <el-form-item prop="rdb_version"   label="RDB版本">
-                <el-input
-                  v-model="addRdbData.taskForm.rdb_version" type="number"
-                  placeholder="RDB版本"
-                ></el-input>
-              </el-form-item>
-            </el-form>
+          <el-form
+            ref="taskForm"
+            :model="addRdbData.taskForm"
+            :rules="addRdbData.rdbrules"
+            :label-position="labelPosition"
+            label-width="100px"
+          >
+            <el-form-item prop="redis_version" label="Redis版本">
+              <el-input
+                v-model="addRdbData.taskForm.redis_version"
+                placeholder="Redis版本"
+              />
+            </el-form-item>
+            <el-form-item prop="rdb_version" label="RDB版本">
+              <el-input
+                v-model="addRdbData.taskForm.rdb_version"
+                type="number"
+                placeholder="RDB版本"
+              />
+            </el-form-item>
+          </el-form>
           <div slot="footer" class="dialog-footer">
             <el-button type="primary" @click="ResettaskForm">重置</el-button>
             <el-button type="primary" @click="insertRdbData">提交</el-button>
@@ -81,7 +81,7 @@
 </template>
 
 <script>
-import {  deleteRdbList, updateRdbList, insertRdbList, getRdbListByPage } from '@/api/syncer/rdblist'
+import { deleteRdbList, updateRdbList, insertRdbList, getRdbListByPage } from '@/api/syncer/rdblist'
 import waves from '@/directive/waves' // waves directive
 import { parseTime } from '@/utils'
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
@@ -159,6 +159,11 @@ export default {
       }
     }
   },
+  watch: {
+    list() {
+      this.timer()
+    }
+  },
   created() {
     this.getList()
   },
@@ -172,11 +177,6 @@ export default {
     //   // this.getListWithOutLoading()
     // }
     // getListData()
-  },
-  watch: {
-    list() {
-      this.timer()
-    }
   },
   destroyed() {
     clearTimeout(this.timer)
@@ -202,7 +202,7 @@ export default {
     timer() {
       return setTimeout(() => {
         this.getListWithOutLoading()
-      } ,3000)
+      }, 3000)
     },
     async deleteRDBTask(row, index) {
       this.listLoading = true
@@ -296,22 +296,22 @@ export default {
     insertRdbData() {
       this.$refs['taskForm'].validate((valid) => {
         if (valid) {
-          if( this.addRdbData.taskForm.redis_version == null ){
+          if (this.addRdbData.taskForm.redis_version == null) {
             this.$message({
               message: 'redis_version不能为空',
               type: 'error'
             })
             return null
-          }else if( this.addRdbData.taskForm.rdb_version == null ){
+          } else if (this.addRdbData.taskForm.rdb_version == null) {
             this.$message({
               message: 'rdb_version',
               type: 'error'
             })
             return null
           }
-          if( this.dialogStatus === 'create' ) {
+          if (this.dialogStatus === 'create') {
             this.insertRDBTask(this.addRdbData.taskForm)
-          }else if( this.dialogStatus === 'update' ) {
+          } else if (this.dialogStatus === 'update') {
             this.updateRDBTask(this.addRdbData.taskForm)
           }
           this.$nextTick(() => {
@@ -319,7 +319,6 @@ export default {
           })
         }
       })
-
     },
     handleDelete(rows, index) {
       // 删除任务信息
@@ -332,13 +331,11 @@ export default {
         // 删除任务信息
         this.deleteRDBTask(rows, index)
       }).catch(() => {
-        //几点取消的提示
+        // 几点取消的提示
       })
-      
-      
     },
     handleUpdate(rows, index) {
-       // 删除任务信息
+      // 删除任务信息
       this.dialogStatus = 'update'
       this.addRdbData.taskForm.id = rows.id
       this.addRdbData.taskForm.rdb_version = rows.rdb_version
