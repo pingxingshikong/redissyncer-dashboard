@@ -685,7 +685,7 @@ export default {
         COMMANDRUNNING: 'info',
         COMMANDRUNING: 'info',
         STARTING: 'info',
-		      FINISH: 'danger',
+		    FINISH: 'danger',
         BROKEN: 'danger'
       }
       return statusMap[status]
@@ -1511,7 +1511,8 @@ export default {
       if (rows.syncType === 'SYNC') {
         return rows.rate2Int + '%'
       } else {
-        return rows.allKeyCount
+        return rows.rate2Int + '%'
+        // return rows.allKeyCount
       }
     },
     sourceAddressFilter(sourceRedisAddress, fileAddress) {
