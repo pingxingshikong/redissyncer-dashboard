@@ -33,7 +33,7 @@
           <a  href="javascript:void(0)" @click="changepasswordDialogVisible = true">
             <el-dropdown-item>修改密码</el-dropdown-item>
           </a>
-          <a target="_blank" href="https://panjiachen.github.io/vue-element-admin-site/#/">
+          <a target="_blank" href="https://tracenature.github.io/redissyncer-docs/#/">
             <el-dropdown-item>使用文档</el-dropdown-item>
           </a>
           <el-dropdown-item divided @click.native="logout">

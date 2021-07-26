@@ -724,11 +724,11 @@ export default {
     syncTypeFilter(syncType) {
       const syncTypeMap = {
         SYNC: '在线同步',
-        RDB: 'RDB数据文件',
-        AOF: 'AOF日志文件',
+        RDB: '本地RDB数据文件',
+        AOF: '本地AOF数据文件',
         ONLINERDB: '在线RDB数据文件',
-        ONLINEAOF: '在线AOF日志文件',
-        MIXED: '混合数据文件',
+        ONLINEAOF: '在线AOF数据文件',
+        MIXED: '本地混合数据文件',
         ONLINEMIXED: '在线混合数据文件'
       }
       return syncTypeMap[syncType]
@@ -836,11 +836,11 @@ export default {
 
         synctypeoptions: [
           { value: 'SYNC', label: '在线同步' },
-          { value: 'RDB', label: 'RDB数据文件导入' },
+          { value: 'RDB', label: '本地RDB数据文件导入' },
           { value: 'ONLINERDB', label: '在线RDB数据文件导入' },
-          { value: 'AOF', label: 'AOF数据文件导入' },
+          { value: 'AOF', label: '本地AOF数据文件导入' },
           { value: 'ONLINEAOF', label: '在线AOF数据文件导入' },
-          { value: 'MIXED', label: '混合数据文件导入' },
+          { value: 'MIXED', label: '本地混合数据文件导入' },
           { value: 'ONLINEMIXED', label: '在线混合数据文件导入' }
         ],
         targetRedisVersionOptions: [
