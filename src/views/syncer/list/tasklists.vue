@@ -323,6 +323,13 @@
             />
           </el-select>
         </el-form-item>
+
+        <el-form-item>
+          <label style="display:inline-block; width: 250px;"><span style="color:red;">* </span>全量数据与目标存在相同key时 </label>
+          <el-radio v-model="addTask.taskForm.rewritecode" label="false">不覆盖</el-radio>
+          <el-radio v-model="addTask.taskForm.rewritecode" label="true">覆盖</el-radio>
+        </el-form-item>
+
         <el-form-item style="width: 70%">
           <p style="color: red">注意：不配置db映射关系同步任务将会将源Redis节点全部数据按原有规则同步至目标节点</p>
           <p style="color: red">注意：配置db映射关系后 如：{0：1} 同步任务仅会将源Redis db0库内的数据同步至目标redis节点db1库,源Redis节点其他db库内的数据将会自动抛弃</p>
@@ -727,7 +734,7 @@ export default {
         RDB: '本地RDB数据文件',
         AOF: '本地AOF数据文件',
         ONLINERDB: '在线RDB数据文件',
-        ONLINEAOF: '在线AOF数据文件',
+        ONLINEAOF: '在线AOF文件',
         MIXED: '本地混合数据文件',
         ONLINEMIXED: '在线混合数据文件'
       }
@@ -824,7 +831,8 @@ export default {
           dbMapper: { },
           autostart: true,
           afresh: true,
-          batchSize: 1500
+          batchSize: 500,
+          rewritecode: 'false'
         },
         fromRedis: true,
         fromFile: false,
@@ -1112,7 +1120,6 @@ export default {
     },
     onClickDrawer() {
       const object = {}
-      object['tasktype'] = this.addTask.taskForm.tasktype
       object['taskname'] = this.addTask.taskForm.taskname
       object['sourceaddress'] = this.addTask.taskForm.sourceaddr
       object['sourcepassword'] = this.addTask.taskForm.sourcepassword
@@ -1121,6 +1128,14 @@ export default {
       object['targetRedisVersionOptions'] = this.addTask.taskForm.targetRedisVersionOptions
       object['autostart'] = this.addTask.taskForm.autostart
       this.drawer = true
+
+      if (this.addTask.taskForm.synctype === '在线同步') {
+        object['synctype'] = 'SYNC'
+      }
+      if (this.addTask.taskForm.tasktype === '全部数据') {
+        object['tasktype'] = 'total'
+      }
+
       this.rowcontent = JSON.stringify(object, undefined, 2)
       // this.jsonstr = object;
     },
@@ -1174,6 +1189,14 @@ export default {
       if (this.addTask.taskForm.tasktype === '全部数据') {
         this.addTask.taskForm.tasktype = 'total'
       }
+      if (this.addTask.taskForm.rewritecode === 'true') {
+        this.addTask.taskForm.rewrite = true
+      }
+
+      if (this.addTask.taskForm.rewritecode === 'false') {
+        this.addTask.taskForm.rewrite = false
+      }
+
       // alert(JSON.stringify(this.addTask.taskForm))
 
       if (this.addTask.fromRedis === true && this.addTask.fromFile === false) {
@@ -1198,6 +1221,7 @@ export default {
               // teste.push(this.tableData[i].source,this.tableData[i].target)
               this.addTask.taskForm.dbMapper[dataes[i].source] = dataes[i].target
             }
+
 
             createTask(this.addTask.taskForm).then(response => {
               this.sleep(1500).then(() => {
@@ -1366,9 +1390,27 @@ export default {
     handleStartTask(rows) {
       // 启动任务信息
       if (rows.offset > -1) {
-        this.startForm.rows = rows
-        this.startForm.afresh = rows.afresh
-        this.add.dialogStartVisible = true
+        if (rows.status == 'FINISH') {
+          // 删除任务信息
+          this.$confirm('本任务已经被执行完成过，此操作将再次执行该同步任务可能会导致数据重复, 是否继续?', '提示', {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            type: 'error'
+          }).then(() => {
+            this.startTask(rows.taskId, true)
+            this.getListWithOutLoading()
+          }).catch(() => {
+            this.$message({
+              message: '取消再次启动任务成功',
+              type: 'success'
+            })
+            // 几点取消的提示
+          })
+        } else {
+          this.startForm.rows = rows
+          this.startForm.afresh = rows.afresh
+          this.add.dialogStartVisible = true
+        }
       } else {
         if (rows.status == 'FINISH') {
           // 删除任务信息
